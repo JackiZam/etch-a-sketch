@@ -1,1 +1,1 @@
-# etch-a-sketch
+This project entails using HTML, CSS, and JavaScript to create a webpage that has a sketchpad on it. This sketchpad should consist of 16x16 div boxes that, once a mouse hovers over them, fill in, therefore acting like a sketchpad. By the end of this project, I will have demonstrated skills in JavaScript, specifically with DOM manipulation. 
