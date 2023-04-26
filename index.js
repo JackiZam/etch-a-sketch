@@ -8,7 +8,6 @@ let rainbowModeMarker = 0;
 // Change Pixels 
 const changePixButton = document.createElement('button');
 changePixButton.textContent = "Change pixel size";
-document.body.appendChild(changePixButton);
 changePixButton.addEventListener('click', () => {
     numDivsPerSide = getUserInput();
     totalDivs = numDivsPerSide * numDivsPerSide;
@@ -18,20 +17,20 @@ changePixButton.addEventListener('click', () => {
 // Reset Pixels
 const resetPadButton = document.createElement('button');
 resetPadButton.textContent = "Reset Pad";
-document.body.appendChild(resetPadButton);
 resetPadButton.addEventListener('click', () => {
+    rainbowModeMarker = 0;
     resetGrid();
 })
 
 // Reset Size & Pixels
 const resetSizeButton = document.createElement('button');
 resetSizeButton.textContent = "Reset Pad & Pixel Size";
-document.body.appendChild(resetSizeButton);
 resetSizeButton.addEventListener('click', () => {
+    rainbowModeMarker = 0;
     resetGrid();
     numDivsPerSide = 16;
     totalDivs = numDivsPerSide * numDivsPerSide;
-    createNewGrid(totalDivs);
+    createNewGrid(totalDivs, "click", rainbowModeMarker);
 })
 
 // Draw on Hover
@@ -39,17 +38,16 @@ const hoverDraw = document.createElement('button');
 hoverDraw.textContent = "Draw on hover";
 hoverDraw.addEventListener('click', () => {
     totalDivs = numDivsPerSide  * numDivsPerSide;
-    createNewGrid(totalDivs, "hover");
+    createNewGrid(totalDivs, "hover", rainbowModeMarker);
 })
 
 // Draw on click
 const clickDraw = document.createElement('button');
 clickDraw.textContent = "Draw on click";
 clickDraw.addEventListener('click', () => {
-    createNewGrid(totalDivs, "click");
+    createNewGrid(totalDivs, "click", rainbowModeMarker);
 })
-document.body.appendChild(hoverDraw);
-document.body.appendChild(clickDraw);
+
 
 // Rainbow mode button
 const rainbowMode = document.createElement('button');
@@ -57,9 +55,26 @@ rainbowMode.textContent = "Rainbow Mode";
 rainbowMode.addEventListener('click', () => {
     rainbowModeMarker = 1;
     console.log(rainbowModeMarker);
-    createNewGrid(totalDivs), rainbowModeMarker;
+    createNewGrid(totalDivs, 'click', rainbowModeMarker);
 })
-document.body.appendChild(rainbowMode);
+
+
+// Appending the body with all of the buttons
+buttonContainer = document.createElement('div');
+buttonContainer.setAttribute('class', 'buttonContainer');
+
+buttonContainer.appendChild(changePixButton);
+buttonContainer.appendChild(resetPadButton);
+buttonContainer.appendChild(resetSizeButton);
+buttonContainer.appendChild(hoverDraw);
+buttonContainer.appendChild(clickDraw);
+buttonContainer.appendChild(rainbowMode);
+document.body.appendChild(buttonContainer);
+
+allButtons = document.querySelectorAll('button');
+allButtons.forEach((button) => {
+    button.setAttribute('class', 'padEditButton');
+})
 
 const randomRed = Math.floor(Math.random() * 256);
 const randomBlue = Math.floor(Math.random() * 256);
@@ -81,8 +96,27 @@ const padStyle = {
     bottom: 0,
     margin: 'auto'
 }
-Object.assign(pad.style, padStyle);
 
+const containerStyle = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'no wrap',
+}
+
+const buttonStyling = {
+    margin: 'auto',
+    marginTop: '60px',
+    border: 'none',
+    borderRadius: '15px',
+    fontSize: '18px',
+    backgroundColor: 'aliceblue',
+}
+
+Object.assign(buttonContainer.style, containerStyle);
+Object.assign(pad.style, padStyle);
+allButtons.forEach((button) => {
+    Object.assign(button.style, buttonStyling);
+})
 const boxStyle = {
     width: 600 / numDivsPerSide + 'px',
     height: 600 / numDivsPerSide + 'px',
@@ -100,8 +134,14 @@ function createFirstGrid(totalDivs) {
 
         box.addEventListener('click', () => {
             if (box.classList.contains('boxNotFilled')) {
-                box.style.backgroundColor = 'black';
-                box.classList.toggle('boxNotFilled');
+                if (box.classList.contains('rainbowMode')) {
+                    box.style.backgroundColor = randColor;
+                    box.classList.toggle('boxNotFilled');
+                }
+                else {
+                    box.style.backgroundColor = 'black';
+                    box.classList.toggle('boxNotFilled');
+                }
             }
             else {
                 box.style.backgroundColor = defaultBackgroundColor;
@@ -130,43 +170,42 @@ function createNewGrid(totalDivs, penType, rainbowModeMarker) {
         newBox.setAttribute('id', 'pixel');
         newBox.style.width = 600 / numDivsPerSide + 'px';
         newBox.style.height = 600 / numDivsPerSide + 'px';
+        /*if (rainbowModeMarker == 1) {
+            newBox.setAttribute('class', 'rainbow');
+        }*/
         pad.appendChild(newBox);
         if (penType == "hover") {
-            if (rainbowModeMarker != 1) {
-                newBox.addEventListener('mouseover', () => {
-                    newBox.style.backgroundColor = 'black';
-                })
-                newBox.addEventListener('click', ()=> {
-                    if (rainbowModeMarker == 0) {
-                        if (newBox.classList.contains('boxNotFilled')) {
-                            newBox.style.backgroundColor = 'black';
-                            newBox.classList.toggle('boxNotFilled');
-                        }
-                        else {
-                            newBox.style.backgroundColor = defaultBackgroundColor;
-                            newBox.classList.toggle('boxNotFilled');
-                        }
-                    }
-                    else {
-                        if (newBox.classList.contains('boxNotFilled')) {
-                            newBox.style.backgroundColor = randColor;
-                            newBox.classList.toggle('boxNotFilled');
-                        }
-                        else {
-                            newBox.style.backgroundColor = defaultBackgroundColor;
-                            newBox.classList.toggle('boxNotFilled');
-                        }
-                    }
-            })}
-            else {
+            if (rainbowModeMarker != 0) {
                 newBox.addEventListener('mouseover', () => {
                     newBox.style.backgroundColor = randColor;
+                })
+                // newBox.addEventListener('click', ()=> {
+                //     if (newBox.classList.contains('boxNotFilled')) {
+                //         if (newBox.classList.contains('rainbowMode')) {
+                //             newBox.style.backgroundColor = randColor;
+                //             newBox.classList.toggle('boxNotFilled');
+                //         }
+                //         else {
+                //             newBox.style.backgroundColor = 'black';
+                //             newBox.classList.toggle('boxNotFilled');
+                //         }
+                //     }
+                //     else {
+                //         newBox.style.backgroundColor = defaultBackgroundColor;
+                //         newBox.classList.toggle('boxNotFilled');
+                //     }
+                // }
+                // )
+            }
+            else {
+                newBox.addEventListener('mouseover', () => {
+                    newBox.style.backgroundColor = 'black';
                 })
             }
         }
         else {
             newBox.addEventListener('click', () => {
-                if (rainbowModeMarker != 1) {
+                if (rainbowModeMarker == 0) {
                     if (newBox.classList.contains('boxNotFilled')) {
                         newBox.style.backgroundColor = 'black';
                         newBox.classList.toggle('boxNotFilled');
